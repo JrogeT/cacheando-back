@@ -25,11 +25,11 @@ app.post("/pusher/auth", (req: any, res: any) => {
         req.body.username
     );
 
-    let player: Player = {
-        id: 'player-' + req.body.socket_id,
-        username: req.body.username,
-        ready: false
-    };
+    let player: Player = new Player(
+        'player-' + req.body.socket_id,
+        false,
+        req.body.username
+    );
     roomsService.addPlayerToRoom(req.body.roomId, player);
 
     res.send(authReponse);
