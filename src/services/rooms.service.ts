@@ -1,13 +1,16 @@
 import RoomsRepository from "../repositories/rooms.repository";
 import Room from "../models/room";
 import Player from "../models/player";
+import PusherService from "./pusher.service";
 
 export default class RoomsService {
 
     private roomsRepository: RoomsRepository;
+    private pusherService: PusherService;
 
     constructor() {
         this.roomsRepository = new RoomsRepository();
+        this.pusherService = PusherService.Instance;
     }
 
     public createRoom(): Room{
@@ -42,6 +45,27 @@ export default class RoomsService {
         if(!player)throw new Error('Player not found');
 
         player.ready = !player.ready;
+
+        this.pusherService.trigger(
+            room.channelName,
+            'client-' + room.channelName + '-ready',
+            { playerReadyId: playerId }
+        );
+
+        const  roomReadyToStart= !room.players.some(
+            (player: Player) => !player.ready);
+        if(roomReadyToStart) this.startGame(room);
+    }
+
+    private startGame(room: Room): void {
+        console.log('starting game in: ' + room.channelName);
+        this.pusherService.trigger(
+            room.channelName,
+            'client-' + room.channelName + '-start-game',
+            {
+                firstPlayer: room.players[0]
+            }
+        );
     }
 
     private generateRandomString(): string {
