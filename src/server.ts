@@ -2,6 +2,7 @@ import AuthService from "./services/auth.service";
 import RoomsService from "./services/rooms.service";
 import Room from "./models/room";
 import Player from "./models/player";
+import GamesService from "./services/games.service";
 
 require("dotenv").config();
 const cors = require("cors");
@@ -16,6 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 const roomsService: RoomsService = new RoomsService();
 const authService: AuthService = new AuthService();
+const gamesService: GamesService = new GamesService();
 
 app.post("/pusher/auth", (req: any, res: any) => {
 
@@ -30,18 +32,30 @@ app.post("/pusher/auth", (req: any, res: any) => {
         false,
         req.body.username
     );
+    console.log('member added to room: ' + player.id);
     roomsService.addPlayerToRoom(req.body.roomId, player);
 
     res.send(authReponse);
 });
 
 app.post("/api/webhooks", (req: any, res: any) => {
-    console.log(req.body.events[0].name);
-    if(req.body.events[0].event){
-        console.log(req.body.events[0].event);
-        console.log(req.body.events[0].data);
+    try {
+        if (req.body.events[0].name == 'member_removed') {
+            const channel = req.body.events[0].channel;
+            const userId = req.body.events[0].user_id;
+            console.log('member removed: ' + userId);
+            const room = roomsService.getRoomByChannel(channel);
+            roomsService.removePlayerFromRoom(room.id, userId);
+        }
+        if (req.body.events[0].event) {
+            console.log(req.body.events[0].event);
+            console.log(req.body.events[0].data);
+        }
+    }catch(e: any){
+        console.log(e.message);
+    }finally {
+        res.status(200).send();
     }
-    res.status(200).send();
 });
 app.get("/api/rooms", (req: any, res: any) => {
     const rooms: Room[] = roomsService.getRooms();
@@ -67,8 +81,28 @@ app.get("/api/rooms/:roomId/players/:playerId/ready", (req: any, res: any) => {
    res.status(200).send();
 });
 
+app.post("/api/rooms/:roomId/players/:playerId/results", (req: any, res: any) => {
+    const {roomId, playerId} = req.params;
+    const { result } = req.body;
+
+    console.log(result);
+    roomsService.setResult(roomId, playerId, result);
+
+    res.status(200).send();
+});
+
+app.post("/api/results", (req: any, res: any): void => {
+   const {dicesValue, launchesMade} = req.body;
+
+   const results = gamesService.getResults(dicesValue, launchesMade);
+
+    res.send(results);
+});
+
 
 const port = process.env.PORT || 3001;
 app.listen(port);
+
+// console.log(gamesService.getResults([5,3,5,5,5], 2));
 
 console.log("App listening: " + port);

@@ -11,4 +11,39 @@ export default class Scoreboard{
         public poker: number | undefined = undefined,
         public large: number | undefined = undefined,
     ) { }
+
+    public apply(result: any) {
+        switch (result.resultPosition) {
+            case 1:
+                this.one = result.resultValue;
+                break;
+            case 2:
+                this.two = result.resultValue;
+                break;
+            case 3:
+                this.three = result.resultValue;
+                break;
+            case 4:
+                this.four = result.resultValue;
+                break;
+            case 5:
+                this.five = result.resultValue;
+                break;
+            case 6:
+                this.six = result.resultValue;
+                break;
+            case 7:
+                this.straight = result.resultValue;
+                break;
+            case 8:
+                this.fullHouse = result.resultValue;
+                break;
+            case 9:
+                this.poker = result.resultValue;
+                break;
+            case 10:
+                this.large = result.resultValue;
+                break;
+        }
+    }
 }

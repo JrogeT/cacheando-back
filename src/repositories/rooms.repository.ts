@@ -17,12 +17,21 @@ export default class RoomsRepository{
         return newRoom;
     }
 
+    public deleteRoom(roomId: string): void {
+        const roomIndex = this.roomList.findIndex((room: Room) => room.id === roomId);
+        this.roomList.splice(roomIndex, 1);
+    }
+
     public findAll(): Room[] {
         return this.roomList;
     }
 
     public findRoomById(id: string): Room | undefined{
         return this.roomList.find((room: Room)=>room.id === id);
+    }
+
+    public findRoomByChannel(channel: string): Room | undefined{
+        return this.roomList.find((room: Room)=>room.channelName === channel);
     }
 
     private generateId(): string {

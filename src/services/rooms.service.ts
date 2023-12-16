@@ -31,10 +31,26 @@ export default class RoomsService {
         return room;
     }
 
+    public getRoomByChannel(channel: string): Room {
+        const room = this.roomsRepository.findRoomByChannel(channel);
+        if(!room){
+            throw new Error('Room not found');
+        }
+        return room;
+    }
+
     public addPlayerToRoom(roomId: string, player: Player): void {
         const room = this.roomsRepository.findRoomById(roomId);
         if(!room) throw new Error('Room not found');
         room.players.push(player);
+    }
+
+    public removePlayerFromRoom(roomId: string, playerId: string): void {
+        const room = this.getRoom(roomId);
+        const playerIndex: number = room.players.findIndex((player: Player) => player.id === playerId);
+        room.players.splice(playerIndex, 1);
+
+        if(room.players.length == 0)this.roomsRepository.deleteRoom(roomId);
     }
 
     public setPlayerReady(roomId: string, playerId: string): void {
@@ -80,4 +96,26 @@ export default class RoomsService {
         return result;
     }
 
+    public setResult(roomId: string, playerId: string, result: any): void {
+        const room = this.roomsRepository.findRoomById(roomId);
+        if(!room) return;
+
+        const player = room.players.find((player: Player) => player.id === playerId);
+        if(!player) return;
+
+        player.scoreboard.apply(result);
+
+        let actualPlayerIndex = room.players.findIndex((player: Player) => player.id === playerId);
+        if(actualPlayerIndex === room.players.length - 1) actualPlayerIndex = -1;
+        const nextPlayer = room.players[actualPlayerIndex + 1];
+
+        this.pusherService.trigger(
+            room.channelName,
+            'client-' + room.channelName + '-turn-finished',
+            {
+                playerInTurn: player,
+                nextPlayer
+            }
+        )
+    }
 }

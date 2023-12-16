@@ -26,7 +26,4 @@ export default class PusherService {
     public trigger(channelName: string, eventName: string, data: any): void {
         this.pusher.trigger(channelName, eventName, data);
     }
-
-
-
 }
