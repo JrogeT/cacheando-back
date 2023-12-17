@@ -42,68 +42,6 @@ export default class GamesService {
         let resultName = '';
         let resultValue = 0;
         let resultPosition = 0;
-        if(this.straightDetected(dicesValue) && scoreboard.straight == null){
-            resultName = 'Escalera';
-            resultValue = 20;
-            resultPosition = 7;
-            if(launchesMade == 1){
-                resultName += ' de mano';
-                resultValue += 5;
-            }
-            results.push({resultName, resultValue, resultPosition});
-        }else if(this.fullHouseDetected(dicesValue) && scoreboard.fullHouse == null){
-            resultName = 'Full House';
-            resultValue = 30;
-            resultPosition = 8;
-            if(launchesMade == 1){
-                resultName += ' de mano';
-                resultValue += 5;
-            }
-            results.push({resultName, resultValue, resultPosition});
-        }else if(this.pokerDetected(dicesValue) && scoreboard.poker == null){
-            resultName = 'Poker';
-            resultValue = 40;
-            resultPosition = 9;
-            if(launchesMade == 1){
-                resultName += ' de mano';
-                resultValue += 5;
-            }
-            results.push({resultName, resultValue, resultPosition});
-        }else if(this.largeDetected(dicesValue) && scoreboard.large == null){
-            resultName = 'La Grande';
-            resultValue = 50;
-            resultPosition = 10;
-            if(launchesMade == 1){
-                resultName += ' de mano';
-                resultValue += 5;
-            }
-            results.push({resultName, resultValue, resultPosition});
-        }else{
-            if(scoreboard.straight == null)
-                results.push({
-                    resultName: 'Escalera',
-                    resultValue: 0,
-                    resultPosition: 7
-                });
-            if(scoreboard.fullHouse == null)
-                results.push({
-                    resultName: 'Full House ',
-                    resultValue: 0,
-                    resultPosition: 8
-                });
-            if(scoreboard.poker == null)
-                results.push({
-                    resultName: 'Poker',
-                    resultValue: 0,
-                    resultPosition: 9
-                });
-            if(scoreboard.large == null)
-                results.push({
-                    resultName: 'La Grande',
-                    resultValue: 0,
-                    resultPosition: 10
-                });
-        }
 
         let value = dicesValue.filter((dice: number) => dice == 1).length;
         if(scoreboard.one == null)
@@ -147,6 +85,73 @@ export default class GamesService {
                 resultValue: value,
                 resultPosition: 6
             })
+
+        if(this.straightDetected(dicesValue)){
+            resultName = 'Escalera';
+            resultValue = 20;
+            resultPosition = 7;
+            if(launchesMade == 1){
+                resultName += ' de mano';
+                resultValue += 5;
+            }
+            if(scoreboard.straight == null)
+                results.push({resultName, resultValue, resultPosition});
+        }else if(this.fullHouseDetected(dicesValue)){
+            resultName = 'Full House';
+            resultValue = 30;
+            resultPosition = 8;
+            if(launchesMade == 1){
+                resultName += ' de mano';
+                resultValue += 5;
+            }
+            if(scoreboard.fullHouse == null)
+                results.push({resultName, resultValue, resultPosition});
+        }else if(this.pokerDetected(dicesValue)){
+            resultName = 'Poker';
+            resultValue = 40;
+            resultPosition = 9;
+            if(launchesMade == 1){
+                resultName += ' de mano';
+                resultValue += 5;
+            }
+            if(scoreboard.poker == null)
+                results.push({resultName, resultValue, resultPosition});
+        }else if(this.largeDetected(dicesValue)){
+            resultName = 'La Grande';
+            resultValue = 50;
+            resultPosition = 10;
+            if(launchesMade == 1){
+                resultName += ' de mano';
+                resultValue += 5;
+            }
+            if(scoreboard.large == null)
+                results.push({resultName, resultValue, resultPosition});
+        }else{
+            if(scoreboard.straight == null)
+                results.push({
+                    resultName: 'Escalera',
+                    resultValue: 0,
+                    resultPosition: 7
+                });
+            if(scoreboard.fullHouse == null)
+                results.push({
+                    resultName: 'Full House ',
+                    resultValue: 0,
+                    resultPosition: 8
+                });
+            if(scoreboard.poker == null)
+                results.push({
+                    resultName: 'Poker',
+                    resultValue: 0,
+                    resultPosition: 9
+                });
+            if(scoreboard.large == null)
+                results.push({
+                    resultName: 'La Grande',
+                    resultValue: 0,
+                    resultPosition: 10
+                });
+        }
 
         return results;
     }

@@ -10,9 +10,12 @@ export default class Scoreboard{
         public fullHouse: number | undefined = undefined,
         public poker: number | undefined = undefined,
         public large: number | undefined = undefined,
+        public total = 0
     ) { }
 
     public apply(result: any) {
+        this.total += result.resultValue;
+
         switch (result.resultPosition) {
             case 1:
                 this.one = result.resultValue;
@@ -45,5 +48,13 @@ export default class Scoreboard{
                 this.large = result.resultValue;
                 break;
         }
+    }
+
+    public isFull(): boolean {
+        for (var key in this) {
+            if (this[key] === undefined)
+                return false;
+        }
+        return true;
     }
 }

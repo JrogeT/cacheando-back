@@ -96,7 +96,7 @@ export default class RoomsService {
         return result;
     }
 
-    public setResult(roomId: string, playerId: string, result: any): void {
+    public finishTurn(roomId: string, playerId: string, result: any): void {
         const room = this.roomsRepository.findRoomById(roomId);
         if(!room) return;
 
@@ -109,13 +109,32 @@ export default class RoomsService {
         if(actualPlayerIndex === room.players.length - 1) actualPlayerIndex = -1;
         const nextPlayer = room.players[actualPlayerIndex + 1];
 
-        this.pusherService.trigger(
-            room.channelName,
-            'client-' + room.channelName + '-turn-finished',
-            {
-                playerInTurn: player,
-                nextPlayer
-            }
-        )
+        // const nextPlayer = new Player('',false,'');
+        // nextPlayer.scoreboard = new Scoreboard(1,2,3,4,5,6,0,0,0);
+        // nextPlayer.scoreboard.getTotal();
+
+        if(nextPlayer.scoreboard.isFull()){
+            const winner = room.players.reduce(
+                (a: Player, b: Player): Player => {
+                    return a.scoreboard.total > b.scoreboard.total ? a : b;
+                });
+            this.pusherService.trigger(
+                room.channelName,
+                'client-' + room.channelName + '-end-game',
+                {
+                    playerInTurn: player,
+                    winner,
+                }
+            )
+            room.players.forEach((player: Player): void => {player.ready = false});
+        }else
+            this.pusherService.trigger(
+                room.channelName,
+                'client-' + room.channelName + '-turn-finished',
+                {
+                    playerInTurn: player,
+                    nextPlayer
+                }
+            )
     }
 }

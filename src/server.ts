@@ -86,7 +86,7 @@ app.post("/api/rooms/:roomId/players/:playerId/results", (req: any, res: any) =>
     const { result } = req.body;
 
     console.log(result);
-    roomsService.setResult(roomId, playerId, result);
+    roomsService.finishTurn(roomId, playerId, result);
 
     res.status(200).send();
 });
@@ -103,6 +103,6 @@ app.post("/api/results", (req: any, res: any): void => {
 const port = process.env.PORT || 3001;
 app.listen(port);
 
-// console.log(gamesService.getResults([5,3,5,5,5], 2));
+// console.log(roomsService.finishTurn('','',{}));
 
 console.log("App listening: " + port);
