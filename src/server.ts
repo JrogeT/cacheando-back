@@ -92,9 +92,9 @@ app.post("/api/rooms/:roomId/players/:playerId/results", (req: any, res: any) =>
 });
 
 app.post("/api/results", (req: any, res: any): void => {
-   const {dicesValue, launchesMade} = req.body;
+   const {dicesValue, launchesMade, scoreboard} = req.body;
 
-   const results = gamesService.getResults(dicesValue, launchesMade);
+   const results = gamesService.getResults(dicesValue, launchesMade, scoreboard);
 
     res.send(results);
 });
