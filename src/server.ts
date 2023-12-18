@@ -32,9 +32,9 @@ app.post("/pusher/auth", (req: any, res: any) => {
         false,
         req.body.username
     );
-    console.log('member added to room: ' + player.id);
     roomsService.addPlayerToRoom(req.body.roomId, player);
 
+    console.log('member authenticated: ' + player.id);
     res.send(authReponse);
 });
 
@@ -43,13 +43,10 @@ app.post("/api/webhooks", (req: any, res: any) => {
         if (req.body.events[0].name == 'member_removed') {
             const channel = req.body.events[0].channel;
             const userId = req.body.events[0].user_id;
-            console.log('member removed: ' + userId);
+
             const room = roomsService.getRoomByChannel(channel);
             roomsService.removePlayerFromRoom(room.id, userId);
-        }
-        if (req.body.events[0].event) {
-            console.log(req.body.events[0].event);
-            console.log(req.body.events[0].data);
+            console.log('member removed: ' + userId);
         }
     }catch(e: any){
         console.log(e.message);
@@ -85,7 +82,6 @@ app.post("/api/rooms/:roomId/players/:playerId/results", (req: any, res: any) =>
     const {roomId, playerId} = req.params;
     const { result } = req.body;
 
-    console.log(result);
     roomsService.finishTurn(roomId, playerId, result);
 
     res.status(200).send();

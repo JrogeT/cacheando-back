@@ -8,14 +8,11 @@ export default class AuthService {
     }
 
     public auth(socketId: string, channel: string, username: string): any{
-        console.log("Trying to auth");
-
         const playerId = 'player-' + socketId;
         const presenceData = {
             user_id: playerId,
             user_info: {username}
         };
-
         return this.pusher.authorizeChannel(socketId, channel, presenceData);
     }
 

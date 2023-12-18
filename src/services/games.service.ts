@@ -14,6 +14,8 @@ export default class GamesService {
     }
 
     public fullHouseDetected(dices: Array<number>): boolean {
+        if(new Set(dices).size == 1) return false;
+
         dices.sort();
 
         let firstRepeatedDices = new Set(dices.slice(0,2));
