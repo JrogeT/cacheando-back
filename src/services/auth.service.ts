@@ -1,4 +1,5 @@
 import PusherService from "./pusher.service";
+import Room from "../models/room";
 
 export default class AuthService {
 
@@ -11,7 +12,7 @@ export default class AuthService {
         const playerId = 'player-' + socketId;
         const presenceData = {
             user_id: playerId,
-            user_info: {username}
+            user_info: { username }
         };
         return this.pusher.authorizeChannel(socketId, channel, presenceData);
     }

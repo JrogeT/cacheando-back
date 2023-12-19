@@ -21,12 +21,6 @@ const gamesService: GamesService = new GamesService();
 
 app.post("/pusher/auth", (req: any, res: any) => {
 
-    const authReponse = authService.auth(
-        req.body.socket_id,
-        req.body.channel_name,
-        req.body.username
-    );
-
     let player: Player = new Player(
         'player-' + req.body.socket_id,
         false,
@@ -34,12 +28,20 @@ app.post("/pusher/auth", (req: any, res: any) => {
     );
     roomsService.addPlayerToRoom(req.body.roomId, player);
 
+    const authReponse = authService.auth(
+        req.body.socket_id,
+        req.body.channel_name,
+        req.body.username
+    );
+
     console.log('member authenticated: ' + player.id);
     res.send(authReponse);
 });
 
 app.post("/api/webhooks", (req: any, res: any) => {
     try {
+        console.log('---------------------------------NEW WEBHOOK---------------------------------------');
+        console.log(req.body.events);
         if (req.body.events[0].name == 'member_removed') {
             const channel = req.body.events[0].channel;
             const userId = req.body.events[0].user_id;
@@ -51,48 +53,73 @@ app.post("/api/webhooks", (req: any, res: any) => {
     }catch(e: any){
         console.log(e.message);
     }finally {
+        console.log('-----------------------------------------------------------------------------------');
         res.status(200).send();
     }
 });
 app.get("/api/rooms", (req: any, res: any) => {
-    const rooms: Room[] = roomsService.getRooms();
-    res.status(200).send(rooms);
+    try{
+        const rooms: Room[] = roomsService.getRooms();
+        res.status(200).send(rooms);
+    }catch (e: any) {
+        res.status(500).send(e.message);
+    }
 });
 
 app.post("/api/rooms", (req: any, res: any) => {
-    const room: Room = roomsService.createRoom();
-    res.status(200).send(room);
+    try{
+        const room: Room = roomsService.createRoom();
+        res.status(200).send(room);
+    }catch (e: any) {
+        res.status(500).send(e.message);
+    }
 });
 
 app.get("/api/rooms/:id", (req: any, res: any) => {
-   const roomId = req.params.id;
-   const room = roomsService.getRoom(roomId);
-   res.status(201).send(room);
+    try{
+       const roomId = req.params.id;
+       const room = roomsService.getRoom(roomId);
+       res.status(201).send(room);
+    }catch (e: any) {
+        res.status(500).send(e.message);
+    }
 });
 
 app.get("/api/rooms/:roomId/players/:playerId/ready", (req: any, res: any) => {
-   const {roomId, playerId} = req.params;
+    try{
+       const {roomId, playerId} = req.params;
 
-   roomsService.setPlayerReady(roomId, playerId);
+       roomsService.setPlayerReady(roomId, playerId);
 
-   res.status(200).send();
+       res.status(200).send();
+    }catch (e: any) {
+        res.status(500).send(e.message);
+    }
 });
 
 app.post("/api/rooms/:roomId/players/:playerId/results", (req: any, res: any) => {
-    const {roomId, playerId} = req.params;
-    const { result } = req.body;
+    try{
+        const {roomId, playerId} = req.params;
+        const { result } = req.body;
 
-    roomsService.finishTurn(roomId, playerId, result);
+        roomsService.finishTurn(roomId, playerId, result);
 
-    res.status(200).send();
+        res.status(200).send();
+    }catch (e: any) {
+        res.status(500).send(e.message);
+    }
 });
 
 app.post("/api/results", (req: any, res: any): void => {
-   const {dicesValue, launchesMade, scoreboard} = req.body;
+    try{
+       const {dicesValue, launchesMade, scoreboard} = req.body;
 
-   const results = gamesService.getResults(dicesValue, launchesMade, scoreboard);
+       const results = gamesService.getResults(dicesValue, launchesMade, scoreboard);
 
-    res.send(results);
+        res.send(results);
+    }catch (e: any) {
+        res.status(500).send(e.message);
+    }
 });
 
 

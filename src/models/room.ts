@@ -4,6 +4,8 @@ export default class Room{
     constructor(
         public id: string,
         public channelName: string,
-        public players: Player[]
+        public players: Player[],
+        public playing = false,
+        public playerInTurnId = ''
     ) { }
 }

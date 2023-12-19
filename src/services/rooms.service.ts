@@ -26,7 +26,7 @@ export default class RoomsService {
     public getRoom(id: string): Room {
         const room = this.roomsRepository.findRoomById(id);
         if(!room){
-            throw new Error('Room not found');
+            throw new Error('Room not found by id: ' + id);
         }
         return room;
     }
@@ -34,7 +34,7 @@ export default class RoomsService {
     public getRoomByChannel(channel: string): Room {
         const room = this.roomsRepository.findRoomByChannel(channel);
         if(!room){
-            throw new Error('Room not found');
+            throw new Error('Room not found by channel: ' + channel);
         }
         return room;
     }
@@ -48,6 +48,9 @@ export default class RoomsService {
     public removePlayerFromRoom(roomId: string, playerId: string): void {
         const room = this.getRoom(roomId);
         const playerIndex: number = room.players.findIndex((player: Player) => player.id === playerId);
+        if(room.playerInTurnId == playerId){
+            this.finishTurn(roomId, playerId, {});
+        }
         room.players.splice(playerIndex, 1);
 
         if(room.players.length == 0)this.roomsRepository.deleteRoom(roomId);
@@ -70,11 +73,14 @@ export default class RoomsService {
 
         const  roomReadyToStart= !room.players.some(
             (player: Player) => !player.ready);
+
         if(roomReadyToStart) this.startGame(room);
     }
 
     private startGame(room: Room): void {
-        console.log('starting game in: ' + room.channelName);
+        console.log('starting game in room: ' + room.channelName);
+        room.playing = true;
+        room.playerInTurnId = room.players[0].id;
         this.pusherService.trigger(
             room.channelName,
             'client-' + room.channelName + '-start-game',
@@ -108,6 +114,8 @@ export default class RoomsService {
         let actualPlayerIndex = room.players.findIndex((player: Player) => player.id === playerId);
         if(actualPlayerIndex === room.players.length - 1) actualPlayerIndex = -1;
         const nextPlayer = room.players[actualPlayerIndex + 1];
+
+        room.playerInTurnId = nextPlayer.id;
 
         // const nextPlayer = new Player('',false,'');
         // nextPlayer.scoreboard = new Scoreboard(1,2,3,4,5,6,0,0,0);

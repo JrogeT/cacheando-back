@@ -14,6 +14,7 @@ export default class Scoreboard{
     ) { }
 
     public apply(result: any) {
+        if(!result) return;
         this.total += result.resultValue;
 
         switch (result.resultPosition) {
